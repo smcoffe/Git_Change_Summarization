@@ -1,0 +1,21 @@
+{
+  "_comments": {
+    "openai_api_key": "Paste your OpenAI API key here",
+    "model": "Any OpenAI chat model, e.g. gpt-4o, gpt-4o-mini, gpt-3.5-turbo",
+    "repositories": "List of local git repos to monitor. name = display label, path = absolute path on disk",
+    "schedule_minutes": "How often to check for new commits (in minutes). Set to 0 to run once and exit.",
+    "lookback_commits": "Max number of recent commits to process on first run per repo",
+    "dashboard_port": "Local port for the web dashboard"
+  },
+  "openai_api_key": "sk-YOUR-KEY-HERE",
+  "model": "gpt-4o-mini",
+  "repositories": [
+    {
+      "name": "my-repo",
+      "path": "/absolute/path/to/your/repo"
+    }
+  ],
+  "schedule_minutes": 30,
+  "lookback_commits": 20,
+  "dashboard_port": 5500
+}
