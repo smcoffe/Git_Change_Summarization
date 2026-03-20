@@ -1,14 +1,16 @@
 {
   "_comments": {
-    "openai_api_key": "Paste your OpenAI API key here",
-    "model": "Any OpenAI chat model, e.g. gpt-4o, gpt-4o-mini, gpt-3.5-turbo",
+    "openai_api_key": "Your OpenAI API key. Required when using the hosted OpenAI service. Leave as an empty string or omit when using a local vLLM server.",
+    "base_url": "Base URL of an OpenAI-compatible API endpoint, including the /v1 suffix. Set this to point at a local vLLM server, e.g. 'http://192.168.1.50:8000/v1'. Leave as an empty string (or omit) to use the hosted OpenAI API.",
+    "model": "Model name understood by the server. For OpenAI: gpt-4o, gpt-4o-mini, etc. For vLLM: the Hugging Face model ID used when the server was started, e.g. 'mistralai/Mistral-7B-Instruct-v0.2'.",
     "repositories": "List of local git repos to monitor. name = display label, path = absolute path on disk",
     "schedule_minutes": "How often to check for new commits (in minutes). Set to 0 to run once and exit.",
     "lookback_commits": "Max number of recent commits to process on first run per repo",
     "dashboard_port": "Local port for the web dashboard"
   },
-  "openai_api_key": "sk-YOUR-KEY-HERE",
-  "model": "gpt-4o-mini",
+  "openai_api_key": "",
+  "base_url": "http://192.168.1.50:8000/v1",
+  "model": "mistralai/Mistral-7B-Instruct-v0.2",
   "repositories": [
     {
       "name": "my-repo",

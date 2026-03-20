@@ -14,7 +14,6 @@ import log_writer
 _CONFIG_PATH = Path(__file__).parent / "config.json"
 
 _REQUIRED_KEYS = [
-    "openai_api_key",
     "model",
     "repositories",
     "schedule_minutes",
@@ -45,6 +44,18 @@ def load_config() -> dict:
         )
         sys.exit(1)
 
+    # Either an OpenAI API key or a local base_url must be provided.
+    has_api_key = bool(config.get("openai_api_key", "").strip())
+    has_base_url = bool(config.get("base_url", "").strip())
+    if not has_api_key and not has_base_url:
+        print(
+            "ERROR: config.json must contain either a non-empty 'openai_api_key' "
+            "(for the hosted OpenAI API) or a non-empty 'base_url' "
+            "(for a local vLLM / OpenAI-compatible server).",
+            file=sys.stderr,
+        )
+        sys.exit(1)
+
     if not isinstance(config["repositories"], list) or not config["repositories"]:
         print("ERROR: config.json 'repositories' must be a non-empty list.", file=sys.stderr)
         sys.exit(1)
@@ -62,8 +73,9 @@ def load_config() -> dict:
 
 def run_once(config: dict) -> None:
     """Process all configured repositories: update trees, detect new commits, write summaries."""
-    api_key: str = config["openai_api_key"]
+    api_key: str = config.get("openai_api_key", "not-needed")
     model: str = config["model"]
+    base_url: str = config.get("base_url", "").strip() or None
     lookback: int = int(config["lookback_commits"])
     repos: list[dict] = config["repositories"]
 
@@ -83,7 +95,7 @@ def run_once(config: dict) -> None:
 
         # --- 3. Summarise and persist ---
         if commits:
-            summary, token_usage = llm_client.summarise(api_key, model, commits)
+            summary, token_usage = llm_client.summarise(api_key, model, commits, base_url=base_url)
             entry = log_writer.make_entry(summary, commits, token_usage)
             log_writer.append_entry(name, entry)
             log_writer.append_token_log(name, model, token_usage)
@@ -118,6 +130,7 @@ def main() -> None:
 
     repos = config["repositories"]
     model = config["model"]
+    base_url = config.get("base_url", "").strip() or None
     interval = int(config["schedule_minutes"])
     port = int(config["dashboard_port"])
 
@@ -125,6 +138,10 @@ def main() -> None:
     print("  Git Intel — Commit Summariser")
     print("=" * 60)
     print(f"  Model        : {model}")
+    if base_url:
+        print(f"  LLM backend  : {base_url}  (local vLLM)")
+    else:
+        print("  LLM backend  : OpenAI hosted API")
     print(f"  Repos        : {', '.join(r['name'] for r in repos)}")
     if interval > 0:
         print(f"  Schedule     : every {interval} minute(s)")

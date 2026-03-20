@@ -1,4 +1,9 @@
-"""Call the OpenAI API to produce plain-English summaries of git commit batches."""
+"""Call an OpenAI-compatible API to produce plain-English summaries of git commit batches.
+
+Works with both the hosted OpenAI service and locally-hosted models served via vLLM
+(or any other OpenAI-compatible server).  Point ``base_url`` at your vLLM instance,
+e.g. ``http://192.168.1.50:8000/v1``, and the same code path is used for both.
+"""
 
 import sys
 from typing import Optional
@@ -51,11 +56,29 @@ def _extract_usage(response) -> dict:
     }
 
 
-def summarise(api_key: str, model: str, commits: list[dict]) -> tuple[str, dict]:
-    """Call the OpenAI chat API and return (summary_string, token_usage_dict).
+def summarise(
+    api_key: str,
+    model: str,
+    commits: list[dict],
+    base_url: Optional[str] = None,
+) -> tuple[str, dict]:
+    """Call an OpenAI-compatible chat API and return (summary_string, token_usage_dict).
 
-    token_usage_dict keys: prompt_tokens, completion_tokens, total_tokens.
-    On error the summary is a fallback string and all token counts are 0.
+    Args:
+        api_key:  API key for OpenAI.  When using a local vLLM server this can be
+                  any non-empty string (e.g. ``"not-needed"``); vLLM ignores it.
+        model:    Model name or path as understood by the server.  For vLLM this is
+                  typically the Hugging Face model ID used when the server was started,
+                  e.g. ``"mistralai/Mistral-7B-Instruct-v0.2"``.
+        commits:  List of commit dicts produced by git_parser.
+        base_url: Base URL of the OpenAI-compatible endpoint, including the ``/v1``
+                  path suffix (e.g. ``"http://192.168.1.50:8000/v1"``).  When
+                  ``None`` (the default) the standard OpenAI hosted API is used.
+
+    Returns:
+        A tuple of (summary_string, token_usage_dict).
+        token_usage_dict keys: prompt_tokens, completion_tokens, total_tokens.
+        On error the summary is a fallback string and all token counts are 0.
     """
     if not commits:
         return "No commits to summarise.", dict(_ZERO_USAGE)
@@ -63,7 +86,13 @@ def summarise(api_key: str, model: str, commits: list[dict]) -> tuple[str, dict]
     prompt = build_prompt(commits)
 
     try:
-        client = openai.OpenAI(api_key=api_key)
+        # Build client kwargs.  base_url routes the client to a local vLLM server
+        # (or any other OpenAI-compatible endpoint) instead of api.openai.com.
+        client_kwargs: dict = {"api_key": api_key or "not-needed"}
+        if base_url:
+            client_kwargs["base_url"] = base_url
+
+        client = openai.OpenAI(**client_kwargs)
         response = client.chat.completions.create(
             model=model,
             messages=[
@@ -83,7 +112,7 @@ def summarise(api_key: str, model: str, commits: list[dict]) -> tuple[str, dict]
         token_usage = _extract_usage(response)
         return summary, token_usage
     except openai.OpenAIError as exc:
-        print(f"[llm_client] ERROR: OpenAI API call failed: {exc}", file=sys.stderr)
+        print(f"[llm_client] ERROR: API call failed: {exc}", file=sys.stderr)
         return "Summary unavailable — API error.", dict(_ZERO_USAGE)
     except Exception as exc:
         print(f"[llm_client] ERROR: Unexpected error during summarisation: {exc}", file=sys.stderr)
