@@ -1,0 +1,47 @@
+[
+  {
+    "id": 1,
+    "timestamp": "2026-03-20T19:25:55.550106+00:00",
+    "repo": "LLM_Course_Materials",
+    "model": "openai/gpt-oss-120b",
+    "prompt_tokens": 0,
+    "completion_tokens": 0,
+    "total_tokens": 0
+  },
+  {
+    "id": 2,
+    "timestamp": "2026-03-20T19:25:56.977984+00:00",
+    "repo": "Agentic_AI_Example_System",
+    "model": "openai/gpt-oss-120b",
+    "prompt_tokens": 0,
+    "completion_tokens": 0,
+    "total_tokens": 0
+  },
+  {
+    "id": 3,
+    "timestamp": "2026-03-20T19:37:45.925767+00:00",
+    "repo": "LLM_Course_Materials",
+    "model": "openai/gpt-oss-120b",
+    "prompt_tokens": 215,
+    "completion_tokens": 299,
+    "total_tokens": 514
+  },
+  {
+    "id": 4,
+    "timestamp": "2026-03-20T19:49:50.100644+00:00",
+    "repo": "LLM_Course_Materials",
+    "model": "openai/gpt-oss-120b",
+    "prompt_tokens": 216,
+    "completion_tokens": 152,
+    "total_tokens": 368
+  },
+  {
+    "id": 5,
+    "timestamp": "2026-03-23T13:15:56.795724+00:00",
+    "repo": "LLM_Course_Materials",
+    "model": "openai/gpt-oss-120b",
+    "prompt_tokens": 278,
+    "completion_tokens": 184,
+    "total_tokens": 462
+  }
+]
