@@ -43,5 +43,14 @@
     "prompt_tokens": 278,
     "completion_tokens": 184,
     "total_tokens": 462
+  },
+  {
+    "id": 6,
+    "timestamp": "2026-03-23T15:54:11.833678+00:00",
+    "repo": "Agentic_AI_Example_System",
+    "model": "openai/gpt-oss-120b",
+    "prompt_tokens": 218,
+    "completion_tokens": 136,
+    "total_tokens": 354
   }
 ]
